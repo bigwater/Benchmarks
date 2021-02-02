@@ -10,7 +10,11 @@ import numpy as np
 import pandas as pd
 
 import keras
-from keras import backend as K
+
+
+from tensorflow.compat.v1.keras import backend as K
+
+
 from keras import optimizers
 from keras.models import Model
 from keras.layers import Input, Dense, Dropout
@@ -37,7 +41,7 @@ def set_seed(seed):
 
     if K.backend() == 'tensorflow':
         import tensorflow as tf
-        tf.set_random_seed(seed)
+        tf.random.set_seed(seed)
         candle.set_parallelism_threads()
 
 
@@ -283,10 +287,10 @@ def run(params):
 
     if (len(args.gpus) > 0):
         import tensorflow as tf
-        config = tf.ConfigProto()
+        config = tf.compat.v1.ConfigProto()
         config.gpu_options.allow_growth = True
         config.gpu_options.visible_device_list = ",".join(map(str, args.gpus))
-        K.set_session(tf.Session(config=config))
+        K.set_session(tf.compat.v1.Session(config=config))
 
     loader = CombinedDataLoader(seed=args.rng_seed)
     loader.load(cache=args.cache,
