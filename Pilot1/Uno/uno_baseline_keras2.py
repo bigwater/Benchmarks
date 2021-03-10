@@ -498,11 +498,12 @@ def run(params):
                                           validation_steps=val_gen.steps)
 
             print('hyliu start')
+            print('per_batch_loss : ', per_batch_history.losses)
+            print('per_batch_r2 : ', per_batch_history.r2)
+            print('per_batch_mae : ', per_batch_history.mae)
+        
             for k in history.history:
-                print(k, ' : ', history[k])
-                print('per_batch_loss : ', per_batch_history.losses)
-                print('per_batch_r2 : ', per_batch_history.r2)
-                print('per_batch_mae : ', per_batch_history.mae)
+                print(k, ' : ', history.history[k])    
             
             print('hyliu end')
 
