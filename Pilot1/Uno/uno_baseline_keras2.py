@@ -275,6 +275,20 @@ class Struct:
         self.__dict__.update(entries)
 
 
+class LossHistory(keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.losses = []
+        # self.val_losses = []
+        self.mae = []
+        self.r2 = []
+
+    def on_batch_end(self, batch, logs={}):
+        self.losses.append(logs.get('loss'))
+        # self.val_losses.append(logs.get('val_loss'))
+        self.mae.append(logs.get('mae'))
+        self.r2.append(logs.get('r2'))
+    
+
 def run(params):
     args = Struct(**params)
     set_seed(args.rng_seed)
@@ -473,6 +487,8 @@ def run(params):
                                 callbacks=callbacks,
                                 validation_data=(x_val_list, y_val))
         else:
+            per_batch_history = LossHistory()
+            callbacks.append(per_batch_history)
             logger.info('Data points per epoch: train = %d, val = %d, test = %d', train_gen.size, val_gen.size, test_gen.size)
             logger.info('Steps per epoch: train = %d, val = %d, test = %d', train_gen.steps, val_gen.steps, test_gen.steps)
             history = model.fit_generator(train_gen, train_gen.steps,
@@ -480,6 +496,15 @@ def run(params):
                                           callbacks=callbacks,
                                           validation_data=val_gen,
                                           validation_steps=val_gen.steps)
+
+            print('hyliu start')
+            for k in history.history:
+                print(k, ' : ', history[k])
+                print('per_batch_loss : ', per_batch_history.losses)
+                print('per_batch_r2 : ', per_batch_history.r2)
+                print('per_batch_mae : ', per_batch_history.mae)
+            
+            print('hyliu end')
 
         # prediction on holdout(test) when exists or use validation set
         if test_gen.size > 0:
